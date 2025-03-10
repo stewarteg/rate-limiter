@@ -15,6 +15,10 @@ func NewRateLimiter(client *redis.Client) *RateLimiter {
 	return &RateLimiter{client: client}
 }
 
+type LimiterStrategy interface {
+	AllowRequest(key string, limit int, blockTime int) bool
+}
+
 func (rl *RateLimiter) AllowRequest(key string, limit int, blockTime time.Duration) bool {
 	ctx := context.Background()
 	pipe := rl.client.TxPipeline()
