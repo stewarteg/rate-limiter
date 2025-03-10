@@ -23,7 +23,7 @@ func RateLimiterMiddleware(next http.Handler) http.Handler {
 		ip := r.RemoteAddr
 		token := r.Header.Get("API_KEY")
 
-		limit, _ := strconv.Atoi("50")
+		limit, _ := strconv.Atoi("5")
 		blockTime, _ := strconv.Atoi("300")
 
 		if token != "" {
