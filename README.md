@@ -12,3 +12,10 @@ vc terá sucesso em 10 requests seguidas, após as 10 a app terá um tempo de de
 Para alterar o token use o site https://jwt.io/, com isso voce consegue editar o valor "request_limit" de dentro do token tirando de 10 para o valor que voce quiser. assim o limite de request passa a ser ele.
 
 Ao NÃO passar o header "API_KEY" vc entra no fluxo de block por IP, nesse caso terá sucesso em 5 requests seguidas, após esse as 5 a app terá um tempo de descanso que é de BLOCK_TIME=300)
+
+
+CURL DE CHAMADA EXEMPLO:
+curl --request GET \
+  --url http://localhost:8080/ \
+  --header 'API_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZXF1ZXN0X2xpbWl0IjoiNSJ9.DijJtIUacJomBsRgAPeVZopkdYS6kCUVGCzYrXw7kdg' \
+  --header 'User-Agent: insomnia/2023.5.8'
