@@ -1,10 +1,13 @@
 package middleware
 
 import (
+	"errors"
 	"net/http"
 	"rate-limiter/limiter"
 	"strconv"
 	"time"
+
+	"github.com/golang-jwt/jwt/v4"
 
 	"github.com/go-redis/redis/v8"
 )
@@ -27,7 +30,10 @@ func RateLimiterMiddleware(next http.Handler) http.Handler {
 		blockTime, _ := strconv.Atoi("300")
 
 		if token != "" {
-			limit, _ = strconv.Atoi("10")
+			requestLimit, err := decodeJWT(token)
+			if err == nil {
+				limit = requestLimit
+			}
 		}
 
 		if !rateLimiter.AllowRequest(ip, limit, time.Duration(blockTime)*time.Second) {
@@ -37,4 +43,29 @@ func RateLimiterMiddleware(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+func decodeJWT(tokenString string) (int, error) {
+	type CustomClaims struct {
+		RequestLimit string `json:"request_limit"`
+		jwt.RegisteredClaims
+	}
+
+	token, _, err := jwt.NewParser().ParseUnverified(tokenString, &CustomClaims{})
+	if err != nil {
+		return 0, err
+	}
+
+	claims, ok := token.Claims.(*CustomClaims)
+	if !ok {
+		return 0, errors.New("invalid token claims")
+	}
+
+	// Converte o valor de "request_limit" para int
+	requestLimit, err := strconv.Atoi(claims.RequestLimit)
+	if err != nil {
+		return 0, err
+	}
+
+	return requestLimit, nil
 }
